@@ -1,0 +1,50 @@
+<!doctype html>
+<html lang="vi">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Kho QR — Quản lý kho tự động</title>
+  <link rel="stylesheet" href="styles.css" />
+  <link rel="stylesheet" href="status.css" />
+</head>
+<body>
+  <aside class="sidebar">
+    <div class="brand"><span class="brand-mark">▣</span><span>Kho<span>QR</span></span></div>
+    <nav>
+      <button class="nav-item active" data-page="dashboard"><span>▦</span> Tổng quan</button>
+      <button class="nav-item" data-page="inventory"><span>▤</span> Hàng trong kho</button>
+      <button class="nav-item" data-page="scan"><span>◷</span> Lịch sử & cảnh báo</button>
+    </nav>
+    <div class="sidebar-footer"><span class="status-dot"></span> Hệ thống hoạt động</div>
+  </aside>
+
+  <main>
+    <header><div><p class="eyebrow" id="today"></p><h1 id="pageTitle">Tổng quan kho</h1></div><button class="outline-btn" id="resetData">↻ Đặt lại kho trống</button></header>
+
+    <section class="page active" id="dashboard">
+      <div class="automation-dashboard">
+        <section class="automation-panel control-panel"><h2>BẢNG ĐIỀU KHIỂN</h2><div class="button-row"><button id="startSystem" class="machine-btn start">▶ Start</button><button id="stopSystem" class="machine-btn stop">■ Stop</button></div><button id="homeSystem" class="machine-btn home">⌂ Set Home</button><div class="button-row"><button id="autoMode" class="machine-btn">Auto</button><button id="manualMode" class="machine-btn selected">Manual</button></div><div class="button-row"><button id="inboundMode" class="machine-btn">↓ Nhập kho</button><button id="outboundMode" class="machine-btn">↑ Xuất kho</button></div><label class="machine-label">Vị trí Nhập/Xuất<input id="positionInput" placeholder="Nhập số ô kệ: 1–18" /></label><label class="machine-label auto-qr-label">Mã QR quét (Auto Nhập)<input id="autoQrInput" autocomplete="off" placeholder="QR được điền tự động từ camera" readonly /></label><div class="connection-card"><h3>THIẾT LẬP KẾT NỐI</h3><label>Chọn camera<select id="cameraSource"><option value="qr-bridge">Camera USB + quét QR (Python)</option></select></label><button id="cameraConnect" class="machine-btn connect">Kết nối camera USB</button><div class="plc-row"><button id="plcConnect" class="machine-btn connect">Kết nối PLC</button><span id="plcAddress">192.168.0.1</span></div></div></section>
+        <section class="automation-panel storage-panel"><div class="storage-heading"><div><h2>SƠ ĐỒ KHO TỰ ĐỘNG</h2><p>Ô xanh: có hàng · Ô đỏ: đang xuất · Ô vàng: vị trí đang chọn.</p></div><div class="legend"><span><i class="available"></i>Có hàng</span><span><i class="empty"></i>Trống</span><span><i class="low"></i>Đang chọn</span></div></div><div class="rack-zone"><div class="rack-grid" id="rackLeft"></div><div class="rack-divider"></div><div class="rack-grid" id="rackRight"></div></div><div class="conveyor-area"><div class="conveyor-group conveyor-camera"><div class="conveyor-sensor" id="sensorOne"></div><div class="conveyor" id="conveyorOne"><span></span></div><div class="conveyor-sensor"></div><div class="camera-unit"><div class="live-label"><i></i> LIVE CAMERA</div><div class="camera-preview"><img id="cameraFeed" alt="Luồng camera USB chưa kết nối" /><span class="camera-caption">Camera USB quét QR</span></div><div class="current-qr">CURRENT QR: <b id="currentQr">—</b></div></div></div><div class="conveyor-group conveyor-xyz"><div class="conveyor-sensor" id="sensorTwo"></div><div class="conveyor" id="conveyorTwo"><span></span></div><div class="conveyor-sensor"></div><div class="xyz-status"><h3>TRẠNG THÁI XYZ</h3><strong id="machineState">IDLE / CẦN HOME</strong><span id="modeState">Chế độ: MANUAL</span></div></div></div></section>
+        <section class="automation-panel jog-panel"><h2>JOG</h2><div class="jog-grid"><button data-jog="X+">X +</button><button data-jog="X-">X -</button><button data-jog="Y+">Y +</button><button data-jog="Y-">Y -</button><button data-jog="Z+">Z +</button><button data-jog="Z-">Z -</button></div><button id="resetXyz" class="machine-btn reset">Reset XYZ</button><div class="system-status"><h2>STATUS</h2><div id="statusText" class="status-details"></div></div><div class="indicator-list"><span>Camera <i class="indicator on"></i></span><span>PLC <i class="indicator on"></i></span><span>Error <i class="indicator"></i></span></div><button id="clearWarehouse" class="clear-btn">Đặt lại kho trống</button></section>
+      </div>
+    </section>
+
+    <section class="page" id="inventory">
+      <div class="stats inventory-stats" id="stats"></div>
+      <section class="panel"><div class="toolbar"><div><h2>Danh sách hàng hóa</h2><p id="inventoryCount"></p></div><div class="filters"><input id="searchInput" placeholder="Tìm tên hàng, SKU, QR..." /><select id="statusFilter"><option value="all">Tất cả trạng thái</option><option value="available">Còn hàng</option><option value="low">Sắp hết</option><option value="empty">Hết hàng</option></select><button class="primary-btn" id="addItem">+ Thêm hàng</button></div></div><div class="table-wrap"><table><thead><tr><th>Hàng hóa</th><th>Mã QR / SKU</th><th>Vị trí</th><th>Tồn kho</th><th>Trạng thái</th><th></th></tr></thead><tbody id="inventoryTable"></tbody></table></div></section>
+      <section class="panel auto-queue"><div class="toolbar"><div><h2>Danh sách xuất kho tự động</h2><p>Thứ tự ở đây sẽ được chế độ Auto Xuất thực hiện lần lượt.</p></div><button class="outline-btn" id="clearQueue">Xóa danh sách</button></div><div class="table-wrap"><table><thead><tr><th>Thứ tự</th><th>Hàng hóa</th><th>Ô kho</th><th>Số lượng</th><th>Trạng thái</th><th></th></tr></thead><tbody id="autoQueueTable"></tbody></table></div></section>
+    </section>
+
+    <section class="page" id="scan">
+      <div class="history-toolbar"><label>Từ ngày<input id="historyFrom" type="date" /></label><label>Đến ngày<input id="historyTo" type="date" /></label><button id="filterHistory" class="machine-btn connect">LỌC</button><button id="clearFilter" class="machine-btn danger">XÓA LỌC</button></div>
+      <div class="history-layout"><section class="history-card"><h2>BẢNG LỊCH SỬ</h2><div class="history-table-wrap"><table class="dark-table"><thead><tr><th>STT</th><th>Mã QR</th><th>Thao tác</th><th>Vị trí</th><th>Thời gian</th></tr></thead><tbody id="historyTable"></tbody></table></div><button id="clearHistory" class="machine-btn danger history-clear">Xóa lịch sử</button></section><div class="history-right"><section class="history-card alarm-card"><h2>BẢNG ALARM</h2><div class="history-table-wrap alarms"><table class="dark-table"><thead><tr><th>Thời gian</th><th>Mô tả cảnh báo</th><th>Trạng thái</th></tr></thead><tbody id="alarmTable"></tbody></table></div><div class="alarm-actions"><button id="resetAlarms" class="machine-btn cyan">Reset Alarm</button><button id="clearAlarms" class="machine-btn danger">Xóa cảnh báo</button></div></section><section class="history-card export-sequence"><h2>BẢNG TRÌNH TỰ XUẤT HÀNG</h2><table class="dark-table"><thead><tr><th>STT</th><th>Hàng hóa</th><th>Vị trí (ô kho)</th><th>SL</th><th>Trạng thái</th></tr></thead><tbody id="sequenceTable"></tbody></table></section></div></div>
+    </section>
+
+    <section class="page" id="outbound"><div class="outbound-layout"><section class="panel"><div class="panel-heading"><div><h2>Tạo phiếu xuất kho</h2><p>Chọn mặt hàng và số lượng cần lấy ra khỏi kho.</p></div></div><form id="outboundForm" class="outbound-form"><label>Hàng hóa<select id="outboundItem" required></select></label><label>Số lượng xuất<input id="outboundQuantity" type="number" min="1" value="1" required /></label><label>Người nhận / Ghi chú<input id="outboundNote" placeholder="Ví dụ: Giao đơn hàng #1024" /></label><div class="item-preview" id="itemPreview"></div><button class="primary-btn full" type="submit">Xác nhận xuất kho</button></form></section><section class="panel"><h2>Phiếu xuất gần đây</h2><div class="activity-list" id="outboundList"></div></section></div></section>
+  </main>
+
+  <dialog id="itemDialog"><form method="dialog" id="itemForm"><div class="modal-heading"><h2>Thêm hàng hóa</h2><button class="icon-btn" value="cancel">×</button></div><div class="form-grid"><label>Tên hàng<input id="newName" required /></label><label>SKU<input id="newSku" required /></label><label>Mã QR<input id="newQr" required /></label><label>Vị trí kệ<input id="newLocation" placeholder="A-01" required /></label><label>Số lượng<input id="newQuantity" type="number" min="0" value="0" required /></label><label>Mức tối thiểu<input id="newMinimum" type="number" min="0" value="5" required /></label></div><div class="modal-actions"><button value="cancel" class="outline-btn">Hủy</button><button value="default" class="primary-btn">Lưu hàng hóa</button></div></form></dialog>
+  <div id="toast" role="status"></div>
+  <script src="app.js"></script>
+</body>
+</html>

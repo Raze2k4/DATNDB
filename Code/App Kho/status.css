@@ -1,0 +1,33 @@
+.status-details {
+  display: grid;
+  gap: 7px;
+  font-size: 11px;
+  color: #bcd0e9;
+}
+
+.status-details div {
+  display: flex;
+  justify-content: space-between;
+  gap: 8px;
+  border-bottom: 1px solid #263752;
+  padding-bottom: 5px;
+}
+
+.status-details div:last-child {
+  border-bottom: 0;
+  padding-bottom: 0;
+}
+
+.status-details b {
+  color: #f5fbff;
+  text-align: right;
+}
+
+.status-details .status-active { color: #4fda84; }
+.status-details .status-scan { color: #ffcf3d; }
+
+.auto-queue { margin-top: 18px; }
+.queue-order { font-weight: 800; color: #2563eb; }
+.queue-pending { color: #b7791f; font-weight: 700; }
+.queue-done { color: #168052; font-weight: 700; }
+.queue-remove { border: 0; background: transparent; color: #dc4c64; cursor: pointer; font-weight: 700; }
